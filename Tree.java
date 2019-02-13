@@ -2,7 +2,9 @@
 import java.util.Random;
 import java.util.Arrays;
 
-enum NODE_TYPE {OPERATION, OPERAND, VARIABLE}
+enum NODE_TYPE {
+    OPERATION, OPERAND, VARIABLE
+}
 // enum OPERATIONS {ADD, SUB, MUL, DIV}
 
 public class Tree {
@@ -30,23 +32,23 @@ public class Tree {
     }
 
     public Tree(String strVal, Tree leftChild, Tree rightChild) {
-        //Error handling, not sure if we actually need this
+        // Error handling, not sure if we actually need this
         if (strVal.equals("x")) {
             this.nodeType = NODE_TYPE.VARIABLE;
             this.variable = strVal;
-        }
-        else {
+        } else {
             this.nodeType = NODE_TYPE.OPERATION;
             this.operation = strVal;
         }
-        // this.nodeType = strVal.equals("x") ? (this.nodeType = NODE_TYPE.VARIABLE) : (this.nodeType = NODE_TYPE.OPERATION, this.operation = strVal);
+        // this.nodeType = strVal.equals("x") ? (this.nodeType = NODE_TYPE.VARIABLE) :
+        // (this.nodeType = NODE_TYPE.OPERATION, this.operation = strVal);
         this.constant = 0;
         this.leftChild = leftChild;
         this.rightChild = rightChild;
     }
 
     // private boolean isNum(String strNum) {
-    //     return strNum.matches("-?\\d+(\\.\\d+)?");
+    // return strNum.matches("-?\\d+(\\.\\d+)?");
     // }
 
     public NODE_TYPE getType() {
@@ -54,7 +56,7 @@ public class Tree {
     }
 
     // public int getValue() {
-    //     return this.value;
+    // return this.value;
     // }
 
     public Tree getLeftTree() {
@@ -66,34 +68,34 @@ public class Tree {
     }
 
     // private void setOperation(OPERATIONS op) {
-    //     switch (op) {
-    //         case ADD:
-    //             this.operation = "+";
-    //         case SUB:
-    //             this.operation = "-";
-    //         case MUL:
-    //             this.operation = "*";
-    //         case DIV:
-    //             this.operation = "/";
-    //         default:
-    //             //
-    //     }
+    // switch (op) {
+    // case ADD:
+    // this.operation = "+";
+    // case SUB:
+    // this.operation = "-";
+    // case MUL:
+    // this.operation = "*";
+    // case DIV:
+    // this.operation = "/";
+    // default:
+    // //
+    // }
     // }
 
     public void setType(NODE_TYPE type) {
         this.nodeType = type;
 
         // switch (type) {
-        //     case OPERATION:
-        //         this.operation = "TEST";
-        //     case OPERAND:
-        //         this.constant = 
-                
+        // case OPERATION:
+        // this.operation = "TEST";
+        // case OPERAND:
+        // this.constant =
+
         // }
     }
 
     // public void setValue(String newValue) {
-    //     this.value = newValue;
+    // this.value = newValue;
     // }
 
     public void setLeftTree(Tree newLeft) {
@@ -106,7 +108,7 @@ public class Tree {
 
     public static void main(String[] args) {
         TreeMaker tester = new TreeMaker();
-        Tree test = tester.partialGrow(2);
+        Tree test = tester.fullGrow(2);
         tester.dfsPrint(test);
     }
 }
@@ -118,72 +120,74 @@ class TreeMaker {
     private static Random rand = new Random();
 
     Tree partialGrow(int depth) {
-        if (depth == 0 && !rand.nextBoolean()) {
-            return new Tree(rand.nextInt(MAX_NUMBER) + 1);
-        }
-        else if (depth == 0 && !rand.nextBoolean()) {
-            return new Tree("x");
-        }
-        else {
+        // if (depth == 0 && !rand.nextBoolean()) {
+        // return new Tree(rand.nextInt(MAX_NUMBER) + 1);
+        // }
+        // else if (depth == 0 && !rand.nextBoolean()) {
+        // return new Tree("x");
+        // }
+        // else {
+        // String op = OPERATIONS[rand.nextInt(OPERATIONS.length)];
+        // return new Tree(op, partialGrow(depth - 1), partialGrow(depth - 1));
+        // }
+
+        if (depth > 0 && rand.nextBoolean()) {
             String op = OPERATIONS[rand.nextInt(OPERATIONS.length)];
             return new Tree(op, partialGrow(depth - 1), partialGrow(depth - 1));
         }
 
-
-        // if (depth > 0 && rand.nextBoolean()) {
-        //     String op = OPERATIONS[rand.nextInt(OPERATIONS.length)];
-        //     return new Tree(op, partialGrow(depth - 1), partialGrow(depth - 1));
-        // }
-
-        // else {
-        //     return new Tree(rand.nextInt(MAX_NUMBER) + 1);
-        // }
+        else {
+            if (rand.nextBoolean()) {
+                return new Tree(rand.nextInt(MAX_NUMBER) + 1);
+            } else {
+                return new Tree("x");
+            }
+        }
     }
 
     Tree fullGrow(int depth) {
-        if (depth == 0 && rand.nextBoolean()) {
-            return new Tree(rand.nextInt(MAX_NUMBER) + 1);
-        }
-        else if (depth == 0 && !rand.nextBoolean()) {
-            return new Tree("x");
-        }
-        else {
+        // if (depth == 0 && rand.nextBoolean()) {
+        // return new Tree(rand.nextInt(MAX_NUMBER) + 1);
+        // }
+        // else if (depth == 0 && !rand.nextBoolean()) {
+        // return new Tree("x");
+        // }
+        // else {
+        // String op = OPERATIONS[rand.nextInt(OPERATIONS.length)];
+        // return new Tree(op, fullGrow(depth - 1), fullGrow(depth - 1));
+        // }
+
+        if (depth > 0) {
             String op = OPERATIONS[rand.nextInt(OPERATIONS.length)];
             return new Tree(op, fullGrow(depth - 1), fullGrow(depth - 1));
+        } else {
+            if (rand.nextBoolean()) {
+                return new Tree(rand.nextInt(MAX_NUMBER) + 1);
+            } else {
+                return new Tree("x");
+            }
         }
-
-
-
-        // if (depth > 0) {
-        //     String op = OPERATIONS[rand.nextInt(OPERATIONS.length)];
-        //     return new Tree(op, fullGrow(depth - 1), fullGrow(depth - 1));
-        // }
-
-        // else {
-        //     return new Tree(rand.nextInt(MAX_NUMBER) + 1);
-        // }
     }
 
     public void dfsPrint(Tree subject) {
         // Tree current = subject;
         if (subject == null) {
             return;
-        }
-        else {
+        } else {
             dfsPrint(subject.leftChild);
-            switch(subject.nodeType) {
-                case OPERAND:
-                    System.out.println(subject.constant);
-                    break;
-                case OPERATION:
-                    System.out.println(subject.operation);
-                    break;
-                case VARIABLE:
-                    System.out.println("variable");
-                    break;
-                default:
-                    System.out.println(subject.nodeType + "");
-                    break;
+            switch (subject.nodeType) {
+            case OPERAND:
+                System.out.println(subject.constant);
+                break;
+            case OPERATION:
+                System.out.println(subject.operation);
+                break;
+            case VARIABLE:
+                System.out.println("variable");
+                break;
+            default:
+                System.out.println(subject.nodeType + "");
+                break;
             }
             dfsPrint(subject.rightChild);
         }
