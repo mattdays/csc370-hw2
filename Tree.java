@@ -1,5 +1,6 @@
 
 import java.util.Random;
+import java.util.Stack;
 import java.util.Arrays;
 
 enum NODE_TYPE {
@@ -10,14 +11,15 @@ enum NODE_TYPE {
 public class Tree {
     NODE_TYPE nodeType;
     String operation;
-    int constant;
+    float constant;
     String variable;
     Tree leftChild;
     Tree rightChild;
 
     public Tree(int value) {
         this.nodeType = NODE_TYPE.OPERAND;
-        this.constant = value;
+        this.operation = null;
+        this.constant = (float) value;
         this.variable = null;
         this.leftChild = null;
         this.rightChild = null;
@@ -25,7 +27,8 @@ public class Tree {
 
     public Tree(String var) {
         this.nodeType = NODE_TYPE.VARIABLE;
-        this.constant = 0;
+        this.operation = null;
+        this.constant = (float) 0;
         this.variable = var;
         this.leftChild = null;
         this.rightChild = null;
@@ -42,7 +45,7 @@ public class Tree {
         }
         // this.nodeType = strVal.equals("x") ? (this.nodeType = NODE_TYPE.VARIABLE) :
         // (this.nodeType = NODE_TYPE.OPERATION, this.operation = strVal);
-        this.constant = 0;
+        this.constant = (float) 0;
         this.leftChild = leftChild;
         this.rightChild = rightChild;
     }
@@ -110,6 +113,12 @@ public class Tree {
         TreeMaker tester = new TreeMaker();
         Tree test = tester.fullGrow(2);
         tester.dfsPrint(test);
+        float ans = (float) 0;
+        Stack<String> ops = new Stack<String>();
+        Stack<Float> vals = new Stack<Float>();
+
+        tester.evaluateHelper((float) 2, test, ops, vals, ans);
+        System.out.println("Answer:" + Float.toString(ans));
     }
 }
 
@@ -118,6 +127,7 @@ class TreeMaker {
     private static String[] OPERATIONS = { "+", "-", "*", "/" };
     private static int MAX_NUMBER = 100;
     private static Random rand = new Random();
+    // private StringBuilder sb = new String;
 
     Tree partialGrow(int depth) {
         // if (depth == 0 && !rand.nextBoolean()) {
@@ -190,6 +200,90 @@ class TreeMaker {
                 break;
             }
             dfsPrint(subject.rightChild);
+        }
+    }
+
+    // public float evaluate (float input, Tree root) {
+    //     StringBuilder sb = evaluateHelper(root, new StringBuilder());
+    //     sb.replace(0,sb.length(), Float.toString(input));
+    //     String resultString = sb.toString();
+
+    //     Stack<String> ops  = new Stack<String>();
+    //     Stack<Double> vals = new Stack<Double>();
+
+    //     String[] strArr = resultString.split(" ");
+        
+    //     for (int i = 0; i < strArr.length; i++) {
+    //         strArr[i]
+    //     }
+
+
+    //     if      (s.equals("("))               ;
+    //     else if (s.equals("+"))    ops.push(s);
+    //     else if (s.equals("-"))    ops.push(s);
+    //     else if (s.equals("*"))    ops.push(s);
+    //     else if (s.equals("/"))    ops.push(s);
+    //     else if (s.equals("sqrt")) ops.push(s);
+    //     else if (s.equals(")")) {
+    //         String op = ops.pop();
+    //         double v = vals.pop();
+    //         if      (op.equals("+"))    v = vals.pop() + v;
+    //         else if (op.equals("-"))    v = vals.pop() - v;
+    //         else if (op.equals("*"))    v = vals.pop() * v;
+    //         else if (op.equals("/"))    v = vals.pop() / v;
+    //         else if (op.equals("sqrt")) v = Math.sqrt(v);
+    //         vals.push(v);
+    //     }
+    //     else vals.push(Double.parseDouble(s));
+    //     StdOut.println(vals.pop());
+
+
+    // }
+    public void evaluateHelper(float input, Tree subject, Stack<String> ops, Stack<Float> vals, float answer) {
+        // Tree current = subject;
+        if (subject == null) {
+            return;
+        } 
+        else {
+            // expression.append(" (");
+            evaluateHelper(input, subject.leftChild, ops, vals, answer);
+            switch (subject.nodeType) {
+            case OPERAND:
+                // expression.append(" ");
+                // expression.append(Float.toString(subject.constant));
+                vals.push(subject.constant);
+                break;
+            case OPERATION:
+                // expression.append(" ");
+                // expression.append(subject.operation);
+                ops.push(subject.operation);
+                break;
+            case VARIABLE:
+                // expression.append(" ");
+                // expression.append(subject.variable);
+                vals.push(input);
+                break;
+            default:
+                System.out.println(subject.nodeType + "");
+                break;
+            }
+            evaluateHelper(input, subject.rightChild, ops, vals, answer);
+            // expression.append(" )");
+            if (!ops.isEmpty() && vals.size() >= 2) {
+                System.out.println("TEST");
+                String op = ops.pop();
+                float v = vals.pop();
+
+                System.out.println(op + v);
+                if      (op.equals("+"))    v = vals.pop() + v;
+                else if (op.equals("-"))    v = vals.pop() - v;
+                else if (op.equals("*"))    v = vals.pop() * v;
+                else if (op.equals("/"))    v = vals.pop() / v;
+                // else if (op.equals("sqrt")) v = Math.sqrt(v);
+                vals.push(v);
+                answer = vals.pop();
+            }
+            return;
         }
     }
 }
