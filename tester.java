@@ -12,17 +12,22 @@ import java.io.IOException;
 
 public class tester {
     public static void main(String[] args) throws ParseException, IOException{
-        
-        BufferedReader dataset = new BufferedReader(new FileReader("dataset1.csv"));
-        String line =  null;
-        HashMap<String,String> map = new HashMap<String, String>();
+        try {
+            BufferedReader dataset = new BufferedReader(new FileReader("hi.csv"));
+            String line =  null;
+            HashMap<String,String> map = new HashMap<String, String>();
 
-        while((line = dataset.readLine()) != null) {
-            String str[] = line.split(",");
-            map.put(str[0],str[1]);
+            while((line = dataset.readLine()) != null) {
+                String str[] = line.split(",");
+                map.put(str[0],str[1]);
+            }
+            for (String name:map.keySet()) {
+                System.out.println(name + " " + map.get(name));
+            }
         }
-        for (String name:map.keySet()) {
-            System.out.println(name + " " + map.get(name));
+        catch (FileNotFoundException exception) {
+            System.out.println("File not found");
         }
+        
     }
 }
