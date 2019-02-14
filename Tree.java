@@ -117,8 +117,10 @@ public class Tree {
         Stack<String> ops = new Stack<String>();
         Stack<Float> vals = new Stack<Float>();
 
-        tester.evaluateHelper((float) 2, test, ops, vals, ans);
-        System.out.println("Answer:" + Float.toString(ans));
+        // tester.evaluateHelper((float) 2, test, ops, vals, ans);
+        float output = tester.evaluateHelper((float) 2, test, ops, vals, ans);
+
+        System.out.println("Answer:" + Float.toString(output));
     }
 }
 
@@ -239,51 +241,68 @@ class TreeMaker {
 
 
     // }
-    public void evaluateHelper(float input, Tree subject, Stack<String> ops, Stack<Float> vals, float answer) {
+    public float evaluateHelper(float input, Tree subject, Stack<String> ops, Stack<Float> vals, float answer) {
         // Tree current = subject;
         if (subject == null) {
-            return;
+            return answer;
         } 
         else {
             // expression.append(" (");
-            evaluateHelper(input, subject.leftChild, ops, vals, answer);
+            float answer1 = evaluateHelper(input, subject.leftChild, ops, vals, answer);
+            vals.push(answer1);
             switch (subject.nodeType) {
-            case OPERAND:
-                // expression.append(" ");
-                // expression.append(Float.toString(subject.constant));
-                vals.push(subject.constant);
-                break;
-            case OPERATION:
-                // expression.append(" ");
-                // expression.append(subject.operation);
-                ops.push(subject.operation);
-                break;
-            case VARIABLE:
-                // expression.append(" ");
-                // expression.append(subject.variable);
-                vals.push(input);
-                break;
-            default:
-                System.out.println(subject.nodeType + "");
-                break;
+                case OPERAND:
+                    // expression.append(" ");
+                    // expression.append(Float.toString(subject.constant));
+                    vals.push(subject.constant);
+                    break;
+                case OPERATION:
+                    // expression.append(" ");
+                    // expression.append(subject.operation);
+                    ops.push(subject.operation);
+                    break;
+                case VARIABLE:
+                    // expression.append(" ");
+                    // expression.append(subject.variable);
+                    vals.push(input);
+                    break;
+                default:
+                    System.out.println(subject.nodeType + "");
+                    break;
             }
-            evaluateHelper(input, subject.rightChild, ops, vals, answer);
-            // expression.append(" )");
-            if (!ops.isEmpty() && vals.size() >= 2) {
-                System.out.println("TEST");
-                String op = ops.pop();
+            if (vals.size() == 2 && !ops.isEmpty()) {
                 float v = vals.pop();
+                // float first = vals.pop();
+                String op = ops.pop();
 
-                System.out.println(op + v);
                 if      (op.equals("+"))    v = vals.pop() + v;
                 else if (op.equals("-"))    v = vals.pop() - v;
                 else if (op.equals("*"))    v = vals.pop() * v;
                 else if (op.equals("/"))    v = vals.pop() / v;
                 // else if (op.equals("sqrt")) v = Math.sqrt(v);
                 vals.push(v);
-                answer = vals.pop();
+                return vals.pop();
             }
-            return;
+            float answer2 = evaluateHelper(input, subject.rightChild, ops, vals, answer);
+            vals.push(answer2);
+            // expression.append(" )");
+            // if (!ops.isEmpty() && !vals.isEmpty()) {
+            //     // System.out.println("TEST");
+            //     String op = ops.pop();
+            //     float v = vals.pop();
+
+            //     // System.out.println(op + v);
+            //     if      (op.equals("+"))    v = vals.pop() + v;
+            //     else if (op.equals("-"))    v = vals.pop() - v;
+            //     else if (op.equals("*"))    v = vals.pop() * v;
+            //     else if (op.equals("/"))    v = vals.pop() / v;
+            //     // else if (op.equals("sqrt")) v = Math.sqrt(v);
+            //     vals.push(v);
+            //     answer = vals.pop();
+            //     // return answer;
+
+            // }
+            return answer2;
         }
     }
 }
