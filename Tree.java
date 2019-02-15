@@ -75,12 +75,8 @@ public class Tree {
         TreeMaker tester = new TreeMaker();
         Tree test = tester.fullGrow(2);
         tester.dfsPrint(test);
-        float ans = (float) 0;
-        Stack<String> ops = new Stack<String>();
-        Stack<Float> vals = new Stack<Float>();
 
         float output = tester.evaluate(test, (float) 2);
-
         System.out.println("Answer:" + Float.toString(output));
     }
 }
