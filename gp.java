@@ -4,178 +4,124 @@ import java.util.Random;
 // import Tree.java;
 // import tester.java;
 
-
 public class gp {
-    // private TreeMaker tester;
-    // private Tree test;
-    private int count=0;
+    private int count = 0;
     private static Random rand = new Random();
-    // public gp() {
-        
+
+    public Tree[] crossover(Tree parent1, Tree parent2) {
+        Tree sub1 = selectSubtree(operation, parent1);
+        Tree sub2 = selectSubtree(operation, parent2);
+
+        Tree temp = sub1;
+        sub1.constant = sub2.constant;
+        sub1.operation = sub2.operation;
+        sub1.variable = sub2.variable;
+        sub1.leftChild = sub2.leftChild;
+        sub1.rightChild = sub2.rightChild;
+
+        sub2.constant = temp.constant;
+        sub2.operation = temp.operation;
+        sub2.variable = temp.variable;
+        sub2.leftChild = temp.leftChild;
+        sub2.rightChild = temp.rightChild;
+
+        Tree[] results = {sub1, sub2};
+        return results;
+
+    }
+
+    // private Tree combine (Tree parent) {
+
     // }
 
-    // public void countNodes(Tree r, )
-
-    public Tree selectSubtree (NODE_TYPE type, Tree root) {
-        // int count = this.count;
+    private Tree selectSubtree(NODE_TYPE type, Tree root) {
         countNodes(type, root, this.count);
-        System.out.println("Count Nodes: "+ this.count);
-        // return root;
+        // System.out.println("Count Nodes: " + this.count);
         if (this.count == 0) {
-            // System.out.println("HERE");
             return null;
-        }
-        else {
-            // System.out.println("hi");
-            int randomInt =  1 + rand.nextInt(this.count);
-            System.out.println("RANDNUM: " + randomInt);
-            // this.count = 0;
+        } else {
+            int randomInt = 1 + rand.nextInt(this.count);
+            // System.out.println("RANDNUM: " + randomInt);
             return pickNode(type, root, randomInt);
         }
     }
 
-    private Boolean isNodeType (NODE_TYPE type, Tree current) {
+    private Boolean isNodeType(NODE_TYPE type, Tree current) {
         if (current == null) {
             return false;
-        }
-        else if (current.nodeType.equals(type)){
+        } else if (current.nodeType.equals(type)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
-        // NODE_TYPE currentType = current.nodeType;
-        // if (currentType.equals(type)) {
-        //     return true;
-        // }
-        // else {
-        //     return false;
-        // }
     }
 
-    private void countNodes (NODE_TYPE type, Tree root, int count) {
-        // int temp = count; 
-        if (root == null){
+    private void countNodes(NODE_TYPE type, Tree root, int count) {
+        if (root == null) {
             return;
         }
         countNodes(type, root.leftChild, this.count);
         if (isNodeType(type, root)) {
-            this.count ++;
+            this.count++;
         }
         countNodes(type, root.rightChild, this.count);
-        // return;
     }
 
-    private int tally(int count) {
-        return count++;
-    }
-
-    private Tree pickNode (NODE_TYPE type, Tree root, int randNum) {
+    private Tree pickNode(NODE_TYPE type, Tree root, int randNum) {
         Stack<Tree> s = new Stack<>();
+        Tree left = null;
+        Tree right = null;
+
+
         s.push(root);
         int count = 0;
-        if (isNodeType(type, root)){
+        if (isNodeType(type, root)) {
             count++;
             if (count == randNum) {
-                System.out.println("HERE" + randNum);
-                // if (randNum == 0){
-                //     return root;
-                // }                
-                return root;            }
+                return root;
+            }
         }
         Tree temp = null;
-        while (!s.isEmpty()){
-            Tree v = s.pop();
-            
-            // if (isNodeType(type, v)) {
-            //     if (count == randNum) {
-            //         // if (randNum == 0){
-            //         //     return root;
-            //         // }                
-            //         temp = v;
-            //         break;
-            //     }
-            //     count++;
-            // }
-            // count++;
-            
-            if (v.leftChild != null) {
-                s.push(v.leftChild);
-                if (isNodeType(type, v.leftChild)){
-                    
+        // Boolean isLeft = false;
+        while (!s.isEmpty()) {
+            if (s.size() > 1) {
+                right = s.pop();
+                if (isNodeType(type, right)) {
                     if (count == randNum) {
-                        if (count % 2 == 0 && s.size() >=2){
-                            temp = s.pop();
-                        }                
-                        temp = s.pop();
+                        // if (count % 2 == 0 && s.size() >= 2) {
+                        //     temp = s.pop();
+                        // }
+                        temp = right;
                         break;
                     }
                     count++;
                 }
-                s.push(v.rightChild);
-                if (isNodeType(type, v.rightChild)){
-                    
+                left = s.pop();
+                if (isNodeType(type, left)) {
                     if (count == randNum) {
-                        if (count % 2 == 1 && s.size() >= 2){
-                            temp = s.pop();
-                        }                    
-                        temp = s.pop();
+                        // if (count % 2 == 1 && s.size() >= 2) {
+                        //     temp = s.pop();
+                        // }
+                        temp = left;
                         break;
                     }
                     count++;
+                }
+                if (left != null) {
+                    s.push(left);
+                    s.push(right);                
+                }
+            }
+            else{
+                Tree v = s.pop();
+                if (v.leftChild != null) {
+                    s.push(v.leftChild);
+                    s.push(v.rightChild);                
                 }
             }
         }
         return temp;
-        
-        //   // int temp = count; 
-        // if (root == null){
-        //     return root;
-        // }
-        // countNodes(type, root.leftChild, this.count);
-        // if (isNodeType(type, root)) {
-        //     this.count ++;
-        // }
-        // countNodes(type, root.rightChild, this.count);
-        // return;
-        // if (root == null) {
-        //     // System.out.println("BASE");
-        //     return null;
-        // }
-        // // else {
-        //     if (isNodeType(type, root)) {
-        //         this.count++;
-        //         if (this.count >= randNum) {
-        //             System.out.println("ROOT");
-        //             return root;
-        //         }
-        //     }
-
-        //     Tree[] children = new Tree[2];
-
-        //     for (int i =0; i < children.length; i++) {
-        //         Tree v = pickNode(type, children[i], randNum, count);
-
-        //         if (v != null) {
-        //             System.out.println("V");
-        //             return v;
-        //         }
-        //     }
-        //     // Tree v1 = pickNode(type, root.leftChild, randNum, count);
-        //     // Tree v2 = pickNode(type, root.rightChild, randNum, count);
-            
-        //     // if (v1 == null) {
-        //     //     if (v2 == null) {
-        //     //         System.out.println("DOUBLE IF");
-        //     //         return null;
-        //     //     }
-        //     //     return v2;
-        //     // }
-        //     // return v1;
-        //     // System.out.println("End");
-        //     return null;
-        }
-    // }
+    }
 
     public static void main(String[] args) {
         TreeMaker tester = new TreeMaker();
@@ -183,11 +129,10 @@ public class gp {
 
         tester.dfsPrint(testTree);
 
-
         NODE_TYPE op = NODE_TYPE.OPERATION;
         Tree sub = new gp().selectSubtree(op, testTree);
-        
-        System.out.println("_______________________________________________________");
+
+        // System.out.println("_______________________________________________________");
         tester.dfsPrint(sub);
         // System.out.println("" + sub.constant);
     }
