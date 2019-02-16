@@ -15,6 +15,15 @@ public class Tree {
     Tree leftChild;
     Tree rightChild;
 
+    public Tree() {
+        this.nodeType = null;
+        this.operation = null;
+        this.constant = (float) 0;
+        this.variable = null;
+        this.leftChild = null;
+        this.rightChild = null;
+    }
+
     public Tree(int value) {
         this.nodeType = NODE_TYPE.OPERAND;
         this.operation = null;
