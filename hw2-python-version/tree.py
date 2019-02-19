@@ -1,4 +1,6 @@
-import math, random
+import math, random, gp
+from sklearn.metrics import mean_squared_error
+
 
 class Tree:
 	OPS_1 = ["x", "+", "-", "*", "/"]
@@ -9,16 +11,21 @@ class Tree:
 	OPS_UNARY = ["e", "sin", "log"]
 	OPS_BINARY = ["+", "-", "*", "/"]
 
-	def __init__(self, ops, original=None, maxDepth=None, growMode=None):
+	def __init__(self, ops, data, original=None, maxDepth=None, growMode=None):
 		if original:
 
 			self.root = Tree.Node(original.root.value)
 			Tree.clone(self.root, original.root.left, original.root.right)
+			# self.fitness = self.calcFitness(data, ops)
+			# self.fitness = gp.fitness(self, ops, data)
 
 		else:
 
 			self.root = Tree.Node(random.choice(Tree.OPS_BINARY))
 			Tree.populate(self.root, ops, maxDepth, growMode)
+			# self.fitness = self.calcFitness(data, ops)
+			# self.fitness = gp.fitness(self, ops, data)
+
 
 	@staticmethod
 	def clone(node, left=None, right=None):
@@ -31,6 +38,36 @@ class Tree:
 
 			node.right = Tree.Node(right.value)
 			Tree.clone(node.right, right.left, right.right)
+
+	def calcFitness(self, data, mode):
+		# print("fitness")
+		dataYs = []
+		ourYs = []
+
+		if (mode == 1):
+			for row in range(len(data)):
+				dataYs.append(data[row][1])
+				ourYs.append(self.evaluate_tree(self.root, data[row][0]))
+			return mean_squared_error(dataYs, ourYs)
+		else:
+			return -1
+			# 	yVal = tree.evaluate_tree(row[0])
+			# 	yVals.append(yVal)
+			# yVals = numpy.array(yVals)
+
+			# diff = numpy.array(20000)
+
+			# numpy.subtract(data[:,1], yVals, diff)
+
+			# numpy.square(diff, diff)
+
+			# numpy.mean(diff)
+
+
+			# diff = (numpy.square(numpy.subtract(data[:,1],yVals))).mean()
+			
+			# print(diff)
+		# return diff
 
 
 # MODE dictates partialGrow or fullGrow
@@ -343,34 +380,42 @@ class Tree:
 
 	def evaluate_tree(self, x, x2=None, x3=None):
 		# print("eval Tree")
-		return float(Tree.evaluate(self.root, x, x2, x3))
+		# return float(Tree.evaluate(self.root, x, x2, x3))
+		return Tree.evaluate(self.root, x, x2, x3)
+
 
 	@staticmethod
 	def evaluate(node, x, x2, x3):
 
 		# print("eval Rec")
+		if node is None:
+			return 0
+		
+		if node.left is None and node.right is None:
+			if node.value == "x":
+				return x
+			elif node.value == "x2":
+				return x2
+			elif node.value == "x3":
+				return x3
+			else:
+				return node.value
 
-		if node.value == "x":
-			return x
-		elif node.value == "x2":
-			return x2
-		elif node.value == "x3":
-			return x3
-		elif type(node.value) is int or type(node.value) is float:
-			return node.value
+		leftVal = Tree.evaluate(node.left,x,x2,x3)
+		rightVal = Tree.evaluate(node.right,x,x2,x3)
 
-		elif node.value == "+":
-			return Tree.evaluate(node.left,x,x2,x3) + Tree.evaluate(node.right,x,x2,x3)
-		elif node.value == "-":	
-			return Tree.evaluate(node.left,x,x2,x3) - Tree.evaluate(node.right,x,x2,x3)
+		if node.value == "+":
+			return leftVal + rightVal
+		elif node.value == "-":
+			return leftVal - rightVal
 		elif node.value == "*":
-			return Tree.evaluate(node.left,x,x2,x3) * Tree.evaluate(node.right,x,x2,x3)
+			return leftVal * rightVal
 		elif node.value == "/":
 			# Catch div by 0?
-			if (Tree.evaluate(node.right,x,x2,x3) >= -0.001 and Tree.evaluate(node.right,x,x2,x3) <= 0.001):
+			if (rightVal >= -0.001 and rightVal <= 0.001):
 				return 1
 			else:
-				return Tree.evaluate(node.left,x,x2,x3) / float(Tree.evaluate(node.right,x,x2,x3))
+				return leftVal / rightVal
 
 	def __str__(self):
 
@@ -380,12 +425,12 @@ class Tree:
 	class Node:
 
 
-		def __init__(self, v, left = None, right = None):
+		def __init__(self, v):
 
 
 			self.value = v
-			self.left = left
-			self.right = right
+			self.left = None
+			self.right = None
 
 		def __str__(self):
 

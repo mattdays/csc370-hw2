@@ -4,7 +4,7 @@ import sys, random, math, numpy
 from tree import Tree
 
 def fitness(tree, mode, data):
-	print("fitness")
+	# print("fitness")
 	yVals = []
 	if (mode == 1):
 		for row in data:
@@ -12,7 +12,17 @@ def fitness(tree, mode, data):
 			yVals.append(yVal)
 		yVals = numpy.array(yVals)
 
+		# diff = numpy.array(20000)
+
+		# numpy.subtract(data[:,1], yVals, diff)
+
+		# numpy.square(diff, diff)
+
+		# numpy.mean(diff)
+
+
 		diff = (numpy.square(numpy.subtract(data[:,1],yVals))).mean()
+		
 		# print(diff)
 	return diff
 # # def howFit(tree, data):

@@ -45,10 +45,12 @@ def generatePopulation(size, startRange, endRange, ops):
     startPop = []
     for i in range(startRange, endRange+1):
         for j in range(0, 50):
-            test = Tree(ops,None, i, 0)
+            test = Tree(ops, dataDict, None,i, 1)
+            # test = Tree(ops,None, i, 0)
             startPop.append(test)
 
-            test2 = Tree(ops, None, i, 1)
+            test2 = Tree(ops, dataDict, None,i, 1)
+            # test2 = Tree(ops, None, i, 1)
             startPop.append(test2)
 
             # Create tree with partialGrow(i)
@@ -66,52 +68,78 @@ def selectTree(pop, ops):
 
     global absoluteBest, bestTree
 
-    k = 20#random.randrange(2,10)
-    tournament = []
-    errors = []
+    tournamentSize = 5#random.randrange(2,10)
+    # tournament = []
+    tournamentA = random.sample(pop, tournamentSize)
+    tournamentB = random.sample(pop, tournamentSize)
 
-    for i in range(k):
-        toAdd = random.choice(pop)
-        tournament.append(toAdd)
-        fitness = gp.fitness(toAdd, ops, dataDict)
-        errors.append(fitness)
+    winners = []
+    errors1 = []
+    errors2 = []
 
-    localBest = errors.index(min(errors))
-    localBestTree = tournament[localBest]
+    for i in range(tournamentSize):
+        fitness1 = gp.fitness(tournamentA[i], ops, dataDict)
+        fitness2 = gp.fitness(tournamentB[i], ops, dataDict)
+        errors1.append(fitness1)
+        errors2.append(fitness2)
 
-    if (localBest < absoluteBest):
-        absoluteBest = localBest
-        bestTree = localBestTree
-    # SHOULD WE WATCH OUT FOR 0????
-    return localBestTree
+    winners.append(tournamentA[errors1.index(min(errors1))] )
+    winners.append(tournamentB[errors2.index(min(errors2))] )
+    # winners.append(min(tournamentA, key = lambda t: t.fitness))
+    # winners.append(min(tournamentB, key = lambda t: t.fitness))
+    return winners
+    # errors = []
+
+    # for i in range(k):
+    #     toAdd = random.choice(pop)
+    #     tournament.append(toAdd)
+    #     fitness = gp.fitness(toAdd, ops, dataDict)
+    #     errors.append(fitness)
+
+    # localBest = errors.index(min(errors))
+    # localBestTree = tournament[localBest]
+
+    # if (errors[localBest] < absoluteBest):
+    #     absoluteBest = errors[localBest]
+    #     bestTree = localBestTree
+    # # SHOULD WE WATCH OUT FOR 0????
+    # return localBestTree
 
 def newPop(pop,ops):
+    global bestTree
     newPop = []
     
     count = 0
     while (count < len(pop)):
         # print("newPop")
 
-        parent1 = selectTree(pop,ops)
-        parent2 = selectTree(pop, ops)
+        # parent1 = selectTree(pop,ops)
+        # parent2 = selectTree(pop, ops)
+        winners = selectTree(pop, ops)
+        parent1, parent2 = winners[0], winners[1]
         child1, child2 = gp.cross(parent1, parent2)
         newPop.append(child1)
         newPop.append(child2)
-        count += 1
+        count += 2
     gp.mutate(newPop, 0.2, 1)
+    generationalBest = min(newPop, key = lambda t: t.fitness)
+    if (generationalBest.fitness < bestTree.fitness):
+        bestTree = generationalBest
+
     return newPop
 
 def runExperiment(filename, numGenerations, ops):
     global bestTree
     readData(filename,1)
-    pop =  generatePopulation(5,2,6,1)
+    pop =  generatePopulation(1,2,6,1)
     
     gens = 0
     while(gens < numGenerations):
         pop = newPop(pop, ops)
         gens += 1
+        print("Gen: ", gens)
     
-    print(bestTree)
+    print(str(bestTree))
 
 
 
